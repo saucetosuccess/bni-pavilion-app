@@ -24,6 +24,12 @@
     const params=new URLSearchParams(location.search);
     const admin=params.get('view')==='admin';
     const target=APP+(location.search||'');
+    if(admin){
+      const icon=document.querySelector('link[rel="icon"]');
+      const touch=document.querySelector('link[rel="apple-touch-icon"]');
+      icon.setAttribute('href',icon.getAttribute('href').replace('REGISTER','ADMIN'));
+      touch.setAttribute('href',touch.getAttribute('href').replace('REGISTER','ADMIN'));
+    }
     document.title=admin?'Admin Pavilion':'Register Pavilion';
     document.getElementById('label').textContent=document.title;
     document.getElementById('open').href=target;
