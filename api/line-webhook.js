@@ -11,20 +11,20 @@ export default async function handler(req, res) {
   const lineSignature = req.headers['x-line-signature'];
   if (lineSignature) headers['x-line-signature'] = lineSignature;
 
+  // Acknowledge LINE immediately. Forwarding continues without delaying Verify/events.
+  res.status(200).send('OK');
+
   try {
     let upstream = await fetch(APP_SCRIPT_URL, {
       method: 'POST', headers, body: rawBody, redirect: 'manual'
     });
     const location = upstream.headers.get('location');
     if (location && [301, 302, 303, 307, 308].includes(upstream.status)) {
-      upstream = await fetch(new URL(location, APP_SCRIPT_URL), {
+      await fetch(new URL(location, APP_SCRIPT_URL), {
         method: 'POST', headers, body: rawBody, redirect: 'follow'
       });
     }
-    res.status(200).send('OK');
   } catch (error) {
     console.error('LINE webhook forward failed', error);
-    // Always acknowledge LINE promptly; Apps Script can be checked separately.
-    res.status(200).send('OK');
   }
 }
